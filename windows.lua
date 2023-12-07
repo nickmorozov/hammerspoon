@@ -1,10 +1,23 @@
 -- Window Management tools
 
 local this = {}
+local log = hs.logger.new("windows", "debug")
 
--- Constants
+-- Private
 
 local dockMargin = 4
+
+-- Add Dock offset to window frame
+local function offsetFrame(frame)
+    -- Add offset to coordinates
+    frame.x = frame.x + dockMargin
+    frame.y = frame.y + dockMargin
+    -- Substract offset from width and height
+    frame.w = frame.w - 2 * dockMargin
+    frame.h = frame.h - 2 * dockMargin
+
+    return frame
+end
 
 -- Calculate maximum allowed window size based on menubar and dock visibility and position
 function this.getFrame()
@@ -13,8 +26,8 @@ function this.getFrame()
     local maxFrame = primaryScreen:fullFrame()
     local allowedFrame = primaryScreen:frame()
 
-    print("maxFrame: " .. maxFrame.w .. "x" .. maxFrame.h .. " (" .. maxFrame.x .. "," .. maxFrame.y .. ")")
-    print(
+    log.d("maxFrame: " .. maxFrame.w .. "x" .. maxFrame.h .. " (" .. maxFrame.x .. "," .. maxFrame.y .. ")")
+    log.d(
         "allowedFrame: " ..
             allowedFrame.w .. "x" .. allowedFrame.h .. " (" .. allowedFrame.x .. "," .. allowedFrame.y .. ")"
     )
@@ -35,21 +48,9 @@ function this.getFrame()
         y = maxFrame.h - allowedFrame.h -- menubar height or 0 if hidden
     end
 
-    -- Add Dock offset to window frame
-    local function offsetFrame(frame)
-        -- Add offset to coordinates
-        frame.x = frame.x + dockMargin
-        frame.y = frame.y + dockMargin
-        -- Substract offset from width and height
-        frame.w = frame.w - 2 * dockMargin
-        frame.h = frame.h - 2 * dockMargin
-
-        return frame
-    end
-
     local frame = offsetFrame(hs.geometry.rect(x, y, w, h))
 
-    print("frame: " .. frame.w .. "x" .. frame.h .. " (" .. frame.x .. "," .. frame.y .. ")")
+    log.d("frame: " .. frame.w .. "x" .. frame.h .. " (" .. frame.x .. "," .. frame.y .. ")")
 
     return frame
 end
@@ -66,7 +67,7 @@ function this.resetWindow()
         function()
             hs.window.focusedWindow():move(frame, nil, false, 0.0)
         end,
-        0.1
+        hs.window.animationDuration
     )
 end
 

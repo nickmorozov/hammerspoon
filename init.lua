@@ -8,6 +8,8 @@ local windows = require("./windows")
 
 -- Hammerspoon
 
+hs.logger.defaultLogLevel = "info"
+
 hs.hotkey.bind(
   {"ctrl", "alt", "shift"},
   "R",
