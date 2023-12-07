@@ -57,15 +57,19 @@ end
 
 -- Module
 
-function this.resetWindow()
+function this.resetWindow(window)
+    if not window then
+        window = hs.window.focusedWindow()
+    end
+
     local frame = this.getFrame()
 
     hs.timer.doUntil(
         function()
-            return hs.window.focusedWindow():frame() == frame
+            return window:frame() == frame
         end,
         function()
-            hs.window.focusedWindow():move(frame, nil, false, 0.0)
+            window:move(frame, nil, false, 0.0)
         end,
         hs.window.animationDuration
     )

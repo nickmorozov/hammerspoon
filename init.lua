@@ -8,7 +8,7 @@ local windows = require("./windows")
 
 -- Hammerspoon
 
-hs.logger.defaultLogLevel = "info"
+hs.logger.defaultLogLevel = "debug"
 
 hs.hotkey.bind(
   {"ctrl", "alt", "shift"},
