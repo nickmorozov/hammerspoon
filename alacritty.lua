@@ -1,8 +1,14 @@
 -- Alacritty Quake style visibility toggle
-local module = {}
+
+local this = {}
+
+-- Constants
+
 local name = "org.alacritty"
 
-function module.toggleAlacritty()
+-- Module
+
+function this.toggleAlacritty()
     local app = hs.application.find(name) or hs.application.open(name, 10, true)
     local window = app and app:mainWindow()
 
@@ -18,4 +24,4 @@ function module.toggleAlacritty()
     end
 end
 
-return module
+return this

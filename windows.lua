@@ -1,17 +1,76 @@
 -- Window Management tools
-local module = {}
 
-function module.setWindow()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    f.x = 70 -- x coordinate
-    f.y = 40 -- y coordinate
-    f.w = 1784 -- width
-    f.h = 1224 -- height
-    win:setFrame(f)
+local this = {}
+
+-- Constants
+
+local dockMargin = 4
+
+-- Calculate maximum allowed window size based on menubar and dock visibility and position
+function this.getFrame()
+    local primaryScreen = hs.screen.primaryScreen()
+
+    local maxFrame = primaryScreen:fullFrame()
+    local allowedFrame = primaryScreen:frame()
+
+    print("maxFrame: " .. maxFrame.w .. "x" .. maxFrame.h .. " (" .. maxFrame.x .. "," .. maxFrame.y .. ")")
+    print(
+        "allowedFrame: " ..
+            allowedFrame.w .. "x" .. allowedFrame.h .. " (" .. allowedFrame.x .. "," .. allowedFrame.y .. ")"
+    )
+
+    -- If Dock and Menu are hidden - window fills the screen
+    local x = 0
+    local y = 0
+    local w = allowedFrame.w
+    local h = allowedFrame.h
+
+    if maxFrame.w == allowedFrame.w then
+        -- Dock is not on the side or hidden
+        -- Set combined dock and menubar height (both could be hidden, giving us 0 here)
+        y = maxFrame.h - allowedFrame.h
+    else
+        -- Dock is on the side of the screen
+        x = maxFrame.w - allowedFrame.w -- dock width
+        y = maxFrame.h - allowedFrame.h -- menubar height or 0 if hidden
+    end
+
+    -- Add Dock offset to window frame
+    local function offsetFrame(frame)
+        -- Add offset to coordinates
+        frame.x = frame.x + dockMargin
+        frame.y = frame.y + dockMargin
+        -- Substract offset from width and height
+        frame.w = frame.w - 2 * dockMargin
+        frame.h = frame.h - 2 * dockMargin
+
+        return frame
+    end
+
+    local frame = offsetFrame(hs.geometry.rect(x, y, w, h))
+
+    print("frame: " .. frame.w .. "x" .. frame.h .. " (" .. frame.x .. "," .. frame.y .. ")")
+
+    return frame
 end
 
-function module.sizeAtCursor()
+-- Module
+
+function this.resetWindow()
+    local frame = this.getFrame()
+
+    hs.timer.doUntil(
+        function()
+            return hs.window.focusedWindow():frame() == frame
+        end,
+        function()
+            hs.window.focusedWindow():move(frame, nil, false, 0.0)
+        end,
+        0.1
+    )
+end
+
+function this.printFrameUnderCursor()
     local pos = hs.mouse.absolutePosition()
     local win =
         hs.fnutils.find(
@@ -40,4 +99,4 @@ function module.sizeAtCursor()
     end
 end
 
-return module
+return this

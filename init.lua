@@ -31,4 +31,4 @@ hs.hotkey.bind({"ctrl"}, "`", alacritty.toggleAlacritty)
 
 -- Set default window size and position
 
-hs.hotkey.bind({"ctrl", "alt", "shift"}, "z", windows.setWindow)
+hs.hotkey.bind({"ctrl", "alt", "shift"}, "z", windows.resetWindow) -- todo: set position first, then size
